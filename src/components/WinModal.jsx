@@ -45,7 +45,7 @@ function StatCard({ label, value, color = '#e2e8f0', sub }) {
  * Tabla de historial — muestra todas las victorias agrupadas.
  * Resalta la mejora en pasos a lo largo del tiempo.
  */
-function WinHistoryTable({ history }) {
+function WinHistoryTable({ history, showTitle = true }) {
   if (history.length === 0) return null;
 
   // Agrupa por mapNumber para mostrar tendencia por mapa
@@ -57,9 +57,11 @@ function WinHistoryTable({ history }) {
 
   return (
     <div className="w-full">
-      <p className="font-retro text-xs mb-2 uppercase tracking-widest" style={{ color: '#475569' }}>
-        Historial de victorias
-      </p>
+      {showTitle && (
+        <p className="font-retro text-xs mb-2 uppercase tracking-widest" style={{ color: '#475569' }}>
+          Historial de victorias
+        </p>
+      )}
       <div
         className="rounded-lg overflow-hidden"
         style={{ border: '1px solid #1e1b4b', maxHeight: 200, overflowY: 'auto' }}
@@ -181,6 +183,82 @@ function LearningInsight({ history }) {
       <p className="font-retro" style={{ color: '#4ade80', fontSize: '9px' }}>
         Mapa {lastMap}: pasó de {first.steps} pasos → {latest.steps} pasos para ganar ({pct}% más eficiente)
       </p>
+    </div>
+  );
+}
+
+/**
+ * Modal solo lectura: historial completo en cualquier momento (desde el header).
+ * z-index 40 — el modal de victoria queda encima (50) si ambos pudieran coincidir.
+ */
+export function HistoryModal({ open, onClose, winHistory }) {
+  if (!open) return null;
+
+  return (
+    <div
+      role="presentation"
+      className="fixed inset-0 flex items-center justify-center z-40"
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="history-modal-title"
+        className="flex flex-col gap-4 p-6 rounded-2xl w-full"
+        style={{
+          maxWidth: 520,
+          background: 'linear-gradient(180deg, #0a0f1e 0%, #070b16 100%)',
+          border: '1px solid #312e81',
+          boxShadow: '0 0 60px #6366f120',
+          margin: '0 16px',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div
+            className="flex items-center gap-2"
+            id="history-modal-title"
+          >
+            <span style={{ fontSize: 28 }}>🏆</span>
+            <div>
+              <h2 className="font-retro text-base" style={{ color: '#e2e8f0' }}>
+                Historial de victorias
+              </h2>
+              <p className="font-retro text-xs mt-0.5" style={{ color: '#64748b' }}>
+                {winHistory.length === 0
+                  ? 'Las victorias aparecerán aquí al completar mapas'
+                  : `${winHistory.length} victoria${winHistory.length === 1 ? '' : 's'} registrada${winHistory.length === 1 ? '' : 's'}`}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="font-retro text-xs px-3 py-1.5 rounded-lg flex-shrink-0"
+            style={{
+              border: '1px solid #475569',
+              color: '#94a3b8',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+            aria-label="Cerrar historial"
+          >
+            Cerrar
+          </button>
+        </div>
+
+        {winHistory.length === 0 ? (
+          <p
+            className="font-retro text-center py-8 px-4 rounded-lg"
+            style={{ background: '#0d0d1f', border: '1px solid #1e1b4b', color: '#64748b', fontSize: '11px' }}
+          >
+            Aún no hay victorias. Entrena al agente hasta que limpie el mapa para ver el primer registro.
+          </p>
+        ) : (
+          <WinHistoryTable history={winHistory} showTitle={false} />
+        )}
+      </div>
     </div>
   );
 }

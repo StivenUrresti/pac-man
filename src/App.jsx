@@ -4,9 +4,9 @@ import GameBoard from './components/GameBoard.jsx';
 import StatsPanel from './components/StatsPanel.jsx';
 import ControlPanel from './components/ControlPanel.jsx';
 import RewardChart from './components/RewardChart.jsx';
-import WinModal from './components/WinModal.jsx';
+import WinModal, { HistoryModal } from './components/WinModal.jsx';
 
-function Header({ episode, isRunning, phase, mapNumber, winCount }) {
+function Header({ episode, isRunning, phase, mapNumber, winCount, onOpenHistory }) {
   const isExploiting = phase === 'exploitation';
   return (
     <header className="flex items-center justify-between px-6 py-4">
@@ -72,15 +72,21 @@ function Header({ episode, isRunning, phase, mapNumber, winCount }) {
           EP {episode}
         </div>
 
-        {/* Win count badge */}
-        {winCount > 0 && (
-          <div
-            className="px-3 py-1.5 rounded-lg font-retro text-xs"
-            style={{ background: '#0d0d1f', border: '1px solid #a16207', color: '#facc15' }}
-          >
-            🏆 {winCount}
-          </div>
-        )}
+        {/* Historial de victorias — siempre clicable */}
+        <button
+          type="button"
+          onClick={onOpenHistory}
+          title="Ver historial de victorias"
+          className="px-3 py-1.5 rounded-lg font-retro text-xs transition-colors"
+          style={{
+            background: '#0d0d1f',
+            border: `1px solid ${winCount > 0 ? '#a16207' : '#334155'}`,
+            color: winCount > 0 ? '#facc15' : '#64748b',
+            cursor: 'pointer',
+          }}
+        >
+          🏆 {winCount}
+        </button>
       </div>
     </header>
   );
@@ -144,6 +150,7 @@ export default function App() {
 
   const episode = ql.getEpisode();
   const [bannerDismissed, setBannerDismissed] = React.useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = React.useState(false);
 
   // Re-show banner if phase goes back to training (after reset)
   React.useEffect(() => {
@@ -151,6 +158,15 @@ export default function App() {
   }, [phase]);
 
   const showBanner = phase === 'exploitation' && !bannerDismissed;
+
+  React.useEffect(() => {
+    if (!historyModalOpen) return;
+    const onKey = e => {
+      if (e.key === 'Escape') setHistoryModalOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [historyModalOpen]);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#0a0a1a' }}>
@@ -160,6 +176,7 @@ export default function App() {
         phase={phase}
         mapNumber={mapNumber.current}
         winCount={winHistory.length}
+        onOpenHistory={() => setHistoryModalOpen(true)}
       />
 
       {/* Modal de victoria */}
@@ -168,6 +185,12 @@ export default function App() {
         winHistory={winHistory}
         onChangeMap={changeMap}
         onContinue={continueAfterWin}
+      />
+
+      <HistoryModal
+        open={historyModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+        winHistory={winHistory}
       />
 
       {/* Exploitation banner */}

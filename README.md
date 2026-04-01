@@ -1,16 +1,41 @@
-# React + Vite
+# PAC-MAN IA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web (React + Vite) con un agente de **aprendizaje por refuerzo (Q-Learning)** que controla a Pac-Man.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Requisito | Notas |
+|-----------|--------|
+| **Node.js** | Versión **18** o superior (recomendado: [LTS actual](https://nodejs.org/)). Incluye **npm**. |
+| **Navegador** | Cualquier navegador moderno (Chrome, Firefox, Safari, Edge). El juego usa `localStorage` para guardar el progreso del aprendizaje. |
 
-## React Compiler
+No hace falta base de datos ni servicios externos para desarrollo local.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Cómo ejecutarlo
 
-## Expanding the ESLint configuration
+1. **Instalar dependencias** (en la raíz del proyecto):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+   ```bash
+   npm install
+   ```
+
+2. **Arrancar el servidor de desarrollo** (recarga en caliente):
+
+   ```bash
+   npm run dev
+   ```
+
+3. Abre en el navegador la URL que muestra Vite (por defecto `http://localhost:5173`).
+
+## Otros comandos
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm run build` | Genera la versión de producción en `dist/`. |
+| `npm run preview` | Sirve localmente el contenido de `dist/` (tras un `build`). |
+| `npm run lint` | Ejecuta ESLint sobre el código. |
+
+## Estructura útil
+
+- `src/` — componentes React, hooks (`useGameLoop`, `useQLearning`) y lógica del juego (`utils/`).
+- `CONCEPTOS.md` — explicación conceptual del funcionamiento (y `CONCEPTOS_SLIDES.md` para presentaciones).
